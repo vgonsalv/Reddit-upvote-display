@@ -55,6 +55,6 @@ function calculateVotes(netVotes,percent){
 
 
 var tokens =parsePage(document.body)
-var votes= calculateVotes(tokens['netVotes'],tokens['percent']);
+var votes= getVotes("http://www.reddit.com/r/theydidthemath/comments/28k8kf/self_calculating_the_number_of_updown_votes_under/cicpxw4?context=3");//calculateVotes(tokens['netVotes'],tokens['percent']);
 formatVotes(tokens['midcolTag'],tokens['likeTag'],tokens['unTag'],tokens['disTag'],votes['up'],votes['down']);
 
