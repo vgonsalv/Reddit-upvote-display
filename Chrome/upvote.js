@@ -14,7 +14,7 @@ MidcolTag.prototype.setDisContent= function(content){
     this.disTag.innerHTML=content;
 };
 MidcolTag.prototype.setWidth= function(width){
-    this.tag.style.width = width +'ex';
+    this.tag.style.width = width;
 }
 
 function DateTag(dateTag){
@@ -28,7 +28,7 @@ function ScoreTag(scoreTag){
     this.wordTag = scoreTag.getElementsByClassName("word")[0];
     this.likeText = scoreTag.textContent;
     
-    this.score = this.numberTag.textContent;
+    this.score = this.numberTag.textContent.replace(/\D/,"");
     this.likes = (/.*\D+(\d+)%.*/).exec(this.likeText)[1];
 }
 ScoreTag.prototype.getScore = function(){
@@ -82,7 +82,7 @@ function formatVotes(midcolTag,votes){
     midcolTag.setDisContent('+' + votes.up + ' -' + (votes.down+1));
 
     var width = Math.ceil(Math.log(Math.max(votes.up+1,votes.down+1))/Math.LN10)+1;
-    midcolTag.setWidth(width*1.5+'ex');
+    midcolTag.setWidth(width*.9+'em');
 }
 
 function calculateVotes(ScoreTag){
