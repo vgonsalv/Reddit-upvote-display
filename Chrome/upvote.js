@@ -1,111 +1,128 @@
-function MidcolTag(midcolTag){
+function MidcolTag(midcolTag) {
     this.tag = midcolTag;
-    this.likeTag=midcolTag.children[3];
-    this.unTag=midcolTag.children[2];
-    this.disTag=midcolTag.children[1];
+    this.likeTag = midcolTag.children[3];
+    this.unTag = midcolTag.children[2];
+    this.disTag = midcolTag.children[1];
 }
-MidcolTag.prototype.setLikeContent= function(content){
-    this.likeTag.innerHTML=content;
+MidcolTag.prototype.setLikeContent = function(content) {
+    this.likeTag.innerHTML = content;
 };
-MidcolTag.prototype.setUnContent= function(content){
-    this.unTag.innerHTML=content;
+MidcolTag.prototype.setUnContent = function(content) {
+    this.unTag.innerHTML = content;
 };
-MidcolTag.prototype.setDisContent= function(content){
-    this.disTag.innerHTML=content;
+MidcolTag.prototype.setDisContent = function(content) {
+    this.disTag.innerHTML = content;
 };
-MidcolTag.prototype.setWidth= function(width){
+MidcolTag.prototype.setWidth = function(width) {
     this.tag.style.width = width;
-}
+};
 
-function DateTag(dateTag){
+function DateTag(dateTag) {
     this.tag = dateTag;
     this.text = dateTag.getElementsByTagName("span")[0];
     this.time = dateTag.getElementsByTagName("time")[0];
 }
-function ScoreTag(scoreTag){
+function ScoreTag(scoreTag) {
     this.tag = scoreTag;
     this.numberTag = scoreTag.getElementsByClassName("number")[0];
     this.wordTag = scoreTag.getElementsByClassName("word")[0];
     this.likeText = scoreTag.textContent;
-    
-    this.score = this.numberTag.textContent.replace(/\D/,"");
+
+    this.score = this.numberTag.textContent.replace(/\D/, "");
     this.likes = (/.*\D+(\d+)%.*/).exec(this.likeText)[1];
 }
-ScoreTag.prototype.getScore = function(){
-    return this.score;    
+ScoreTag.prototype.getScore = function() {
+    return this.score;
 };
-ScoreTag.prototype.getLikes = function(){
-    return this.likes;    
+ScoreTag.prototype.getLikes = function() {
+    return this.likes;
 };
 
-function ShortlinkTag(shortlinkTag){
+function ShortlinkTag(shortlinkTag) {
     this.tag = shortlinkTag;
     this.text = shortlinkTag.textContent;
     this.linkBox = document.getElementById("shortlink-text");
 }
-function InfoTag(info){
+function InfoTag(info) {
     this.tag = info;
-    this.dateTag= new DateTag(info.getElementsByClassName("date")[0]);
+    this.dateTag = new DateTag(info.getElementsByClassName("date")[0]);
     this.scoreTag = new ScoreTag(info.getElementsByClassName("score")[0]);
     this.shortlinkTag = new ShortlinkTag(info.getElementsByClassName("shortlink")[0]);
 }
-function Votes(up,down){
+function Votes(up, down) {
     this.up = up;
-    this.down= down;
+    this.down = down;
 }
 
 
-function findInfoTag(element){
+function findInfoTag(element) {
     return new InfoTag(element.getElementsByClassName("linkinfo")[0]);
 }
-function findMidcolTag(element){
+function findMidcolTag(element) {
     var elems = element.getElementById("siteTable").getElementsByTagName("div");
-    for(i in elems){
-	if((" "+elems[i].className).indexOf(" midcol ")>-1){
-	    return new MidcolTag(elems[i]);
-	}
-    }    
+    for (i in elems) {
+        if ((" " + elems[i].className).indexOf(" midcol ") > -1) {
+            return new MidcolTag(elems[i]);
+        }
+    }
 }
-
-function getPage(url){
+function sendVotes(shortlink,infoTag){
     var xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", url, false );
-    xmlHttp.send( null );
-    return new DOMParser().parseFromString(xmlHttp.response,"text/html");
+    xmlHttp.open("POST", "http://localhost:8080/Reddit-upvote-display/votecount", true);
+    xmlHttp.setRequestHeader("Content-type", "text/plain");
+    var obj = {shortlink:shortlink,score:infoTag.scoreTag.getScore(),likes:infoTag.scoreTag.getLikes()};
+    xmlHttp.send(JSON.stringify(obj));
 }
 
-function formatVotes(midcolTag,votes){
-    adjustVotes(midcolTag,votes);
-    midcolTag.setLikeContent('+' + (votes.up+1) + ' -' + votes.down);
+function getPage(url) {
+    var xmlHttp = null;
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", url, false);
+    xmlHttp.send(null);
+    return new DOMParser().parseFromString(xmlHttp.response, "text/html");
+}
+
+function formatVotes(midcolTag, votes) {
+    adjustVotes(midcolTag, votes);
+    midcolTag.setLikeContent('+' + (votes.up + 1) + ' -' + votes.down);
     midcolTag.setUnContent('+' + votes.up + ' -' + votes.down);
-    midcolTag.setDisContent('+' + votes.up + ' -' + (votes.down+1));
+    midcolTag.setDisContent('+' + votes.up + ' -' + (votes.down + 1));
 
-    var width = Math.ceil(Math.log(Math.max(votes.up+1,votes.down+1))/Math.LN10)+1;
-    midcolTag.setWidth(width*.9+'em');
+    var width = Math.ceil(Math.log(Math.max(votes.up + 1, votes.down + 1)) / Math.LN10) + 1;
+    midcolTag.setWidth(width * .9 + 'em');
 }
 
-function calculateVotes(ScoreTag){
-    var votes= new Votes();
-    var percent = ScoreTag.getLikes()/100;
+function calculateVotes(ScoreTag) {
+    var votes = new Votes();
+    var percent = ScoreTag.getLikes() / 100;
     var netVotes = ScoreTag.getScore();
-    votes.up= Math.round(percent*netVotes/(2*percent-1));
-    votes.down=Math.round(netVotes*(1-percent)/(2*percent-1));
+    votes.up = Math.round(percent * netVotes / (2 * percent - 1));
+    votes.down = Math.round(netVotes * (1 - percent) / (2 * percent - 1));
     return votes;
 }
-function adjustVotes(midcolTag,votes){
-    switch(midcolTag.tag.className){
-    case "midcol likes":
-	votes.up-=1; break;
-    case "midcol unvoted": break;
-    case "midcol dislikes":
-	votes.down-=1; break;
+function adjustVotes(midcolTag, votes) {
+    switch (midcolTag.tag.className) {
+        case "midcol likes":
+            votes.up -= 1;
+            break;
+        case "midcol unvoted":
+            break;
+        case "midcol dislikes":
+            votes.down -= 1;
+            break;
     }
 }
 
 
 var midcolTag = findMidcolTag(document);
 var infoTag = findInfoTag(document.body);
-var votes=calculateVotes(infoTag.scoreTag)
-formatVotes(midcolTag,votes);
+if (infoTag.scoreTag.getLikes() !== 50) {
+    var votes = calculateVotes(infoTag.scoreTag);
+    formatVotes(midcolTag, votes);
+    var unparsed_link = infoTag.shortlinkTag.linkBox.getAttribute("value");
+    var result = (/http:\/\/redd.it\/([a-z0-9]+)/).exec(unparsed_link);
+    var shortlink = result[1];
+    sendVotes(shortlink,infoTag);
+}
 
