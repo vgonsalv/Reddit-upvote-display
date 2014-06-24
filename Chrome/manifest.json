@@ -9,9 +9,11 @@
           "128": "icon128.png" },
     "content_scripts": [
 	{
-	    "matches": ["http://www.reddit.com/r/*/comments/*"],
+	    "matches": ["http://*.reddit.com/*","https://*.reddit.com/*"],
 	    "js": ["upvote.js"]
 	}
+    ],
+    "permissions": [
+	"http://redditupvotedisplay-env.elasticbeanstalk.com/votecount"
     ]
-
 }
