@@ -207,7 +207,7 @@ function formatVotesArrows(midcolTag, score, likes, rdo) {
     len = Math.max(len, votes.up.toString().length, votes.down.toString().length);
     midcolTag.setDisContent(votes.up + ' ' + votes.down);
 
-    midcolTag.setWidth(1.2 * len + 'ex');
+    midcolTag.setWidth(Math.max(1.2 * len,5.1) + 'ex');
 }
 function calculateVotes(score, percent) {
     var votes = new Votes();
@@ -243,7 +243,7 @@ function format(score, likes, rdo, adjust) {
 
         if (upper.up === lower.up) {
             final.up += (rdo.plusMinus ? '+' : '')
-                    + (rdo.comma ? numberWithCommas(final.up) : final.up);
+                    + (rdo.comma ? numberWithCommas(upper.up) : upper.up);
         } else {
             final.up = (rdo.plusMinus ? '+' : '')
                     + (rdo.comma ? numberWithCommas(Math.min(lower.up, upper.up)) : Math.min(lower.up, upper.up))
@@ -252,7 +252,7 @@ function format(score, likes, rdo, adjust) {
         }
         if (upper.down === lower.down) {
             final.down += (rdo.plusMinus ? '-' : '')
-                    + (rdo.comma ? numberWithCommas(final.down) : final.down);
+                    + (rdo.comma ? numberWithCommas(upper.down) : upper.down);
         } else {
             final.down = (rdo.plusMinus ? '-' : '')
                     + (rdo.comma ? numberWithCommas(Math.min(lower.down, upper.down)) : Math.min(lower.down, upper.down))
@@ -273,13 +273,7 @@ function format(score, likes, rdo, adjust) {
     }
     return final;
 }
-function addOptions(){
-    var iconURL = getIconURL();
-    var optionURL = getOptionURL();
-    var head = document.getElementById("header-bottom-right");
-    head.appendChild(create('<span class = "serparator">|</span><span><a target="_blank" href="'
-            +optionURL+'"><img src="'+iconURL+'"></a></span>'));
-}
+
 
 function doUpvotes() {
     refreshStorage();
