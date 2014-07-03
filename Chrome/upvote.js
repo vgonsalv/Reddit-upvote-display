@@ -274,8 +274,10 @@ function format(score, likes, rdo, adjust) {
     return final;
 }
 function addOptions(){
+    var url = chrome.extension.getURL("");
     var head = document.getElementById("header-bottom-right");
-    head.appendChild(create('<span><button>Save</button></span>'));
+    head.appendChild(create('<span class = "serparator">|</span><span><a target="_blank" href="'
+            +chrome.extension.getURL("options.html")+'"><img src="'+url+'icon16.png"”></a></span>'));
 }
 
 function doUpvotes() {
