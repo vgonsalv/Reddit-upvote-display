@@ -1,12 +1,38 @@
-// Import the page-mod API
 var pageMod = require("sdk/page-mod");
-// Import the self API
 var self = require("sdk/self");
+var prefs = require("sdk/simple-prefs").prefs;
+if (prefs.RUDOption === "")
+    prefs.RUDOption = '{"comments":{"enabled":true,"linkinfo":{"enabled":true,"plusMinus":true,"comma":true,"range":true,"overRES":true},"arrows":{"enabled":true,"plusMinus":true,"comma":true,"range":true,"overRES":true}},"frontpage":{"enabled":true,"res":{"enabled":true,"plusMinus":true,"comma":true,"range":true,"overRES":true},"arrows":{"enabled":true,"plusMinus":true,"comma":true,"range":true,"overRES":true}}}';
 
-// Create a page mod
-// It will run a script whenever a ".org" URL is loaded
-// The script replaces the page contents with a message
 pageMod.PageMod({
-  include: /http:\/\/www.reddit.com\/r\/.*\/comments\/.*/,
-  contentScriptFile: self.data.url("upvote.js")
+    include: /.*reddit.com\/.*/,
+    contentScriptFile: [
+        self.data.url("options.js"),
+        self.data.url("upvote.js"),
+        self.data.url("firefox-restore-options.js")
+    ],
+    onAttach: function(worker) {
+        worker.port.emit("options", prefs.RUDOption);
+        worker.port.on("showOptions", function(message) {
+            console.log("main.js" + message);
+            require("sdk/tabs").open(self.data.url("options.html"));
+        });
+    },
+    contentScriptOptions: {
+        pageURL: self.data.url("options.html"),
+        iconURL: self.data.url("icon16.png")
+    }
+});
+pageMod.PageMod({
+    include: "resource://com-dot-reddit-upvote-display-at-jetpack/upvote/data/options.html",
+    contentScriptFile: [
+        self.data.url("options.js"),
+        self.data.url("saveRelay.js")
+    ],
+    onAttach: function(worker) {
+        worker.port.emit("options", prefs.RUDOption);
+        worker.port.on("saveOptions", function(message) {
+            prefs.RUDOption = message;
+        });
+    }
 });
