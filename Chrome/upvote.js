@@ -274,10 +274,11 @@ function format(score, likes, rdo, adjust) {
     return final;
 }
 function addOptions(){
-    var url = chrome.extension.getURL("");
+    var iconURL = getIconURL();
+    var optionURL = getOptionURL();
     var head = document.getElementById("header-bottom-right");
     head.appendChild(create('<span class = "serparator">|</span><span><a target="_blank" href="'
-            +chrome.extension.getURL("options.html")+'"><img src="'+url+'icon16.png"”></a></span>'));
+            +optionURL+'"><img src="'+iconURL+'"></a></span>'));
 }
 
 function doUpvotes() {
@@ -334,5 +335,3 @@ function doUpvotes() {
         }
     }
 }
-doUpvotes();
-
