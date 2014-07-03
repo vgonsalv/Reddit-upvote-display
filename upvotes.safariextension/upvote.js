@@ -193,21 +193,21 @@ function formatVotesLinkinfo(linkinfoTag, votes) {
     linkinfoTag.tag.insertBefore(toAdd, linkinfoTag.shortlinkTag.tag);
 }
 function formatVotesArrows(midcolTag, score, likes, rdo) {
-    score = adjustVotes(midcolTag, score);
-    var votes = format(score, likes, rdo, +1);
+    var adj = adjustVotes(midcolTag);
+    var votes = format(score, likes, rdo, +1,adj);
     var len = Math.max(votes.up.toString().length, votes.down.toString().length);
     midcolTag.setLikeContent(votes.up + ' ' + votes.down);
 
 
-    votes = format(score, likes, rdo);
+    votes = format(score, likes, rdo ,0,adj);
     len = Math.max(len, votes.up.toString().length, votes.down.toString().length);
     midcolTag.setUnContent(votes.up + ' ' + votes.down);
 
-    votes = format(score - 1, likes, rdo, -1);
+    votes = format(score - 1, likes, rdo, -1 , adj);
     len = Math.max(len, votes.up.toString().length, votes.down.toString().length);
     midcolTag.setDisContent(votes.up + ' ' + votes.down);
 
-    midcolTag.setWidth(1.2 * len + 'ex');
+    midcolTag.setWidth(Math.max(1.2 * len,5.1) + 'ex');
 }
 function calculateVotes(score, percent) {
     var votes = new Votes();
@@ -215,35 +215,42 @@ function calculateVotes(score, percent) {
     votes.down = Math.round(score * (1 - percent) / (2 * percent - 1));
     return votes;
 }
-function adjustVotes(midcolTag, score) {
+function adjustVotes(midcolTag) {
     switch (midcolTag.tag.className) {
         case "midcol likes":
-            return score - 1;
+            return  1;
         case "midcol unvoted":
-            return score;
+            return 0;
         case "midcol dislikes":
-            return score + 1;
+            return -1;
     }
 }
 function inComments() {
     return (/.*reddit.com\/r\/[^\/]+\/comments\/.*/).test(document.URL);
 }
-function format(score, likes, rdo, adjust) {
+function format(score, likes, rdo, adj1,adj2) {
     var final = new Votes("", "");
     if (rdo.range) {
         var upper = calculateVotes(score, (likes - -.5) / 100);
         var lower = calculateVotes(score, (likes - .5) / 100);
-        if (typeof adjust !== undefined && adjust > 0) {
+        if ( adj1&& adj1 > 0) {
             upper.up += 1;
             lower.up += 1;
-        } else if (typeof adjust !== undefined && adjust < 0) {
+        } else if (adj1&& adj1 < 0) {
+            upper.down += 1;
+            lower.down += 1;
+        }
+        if (adj2 && adj2 > 0) {
+            upper.up -= 1;
+            lower.up -= 1;
+        } else if (adj2 && adj2 < 0) {
             upper.down -= 1;
             lower.down -= 1;
         }
 
         if (upper.up === lower.up) {
             final.up += (rdo.plusMinus ? '+' : '')
-                    + (rdo.comma ? numberWithCommas(final.up) : final.up);
+                    + (rdo.comma ? numberWithCommas(upper.up) : upper.up);
         } else {
             final.up = (rdo.plusMinus ? '+' : '')
                     + (rdo.comma ? numberWithCommas(Math.min(lower.up, upper.up)) : Math.min(lower.up, upper.up))
@@ -252,7 +259,7 @@ function format(score, likes, rdo, adjust) {
         }
         if (upper.down === lower.down) {
             final.down += (rdo.plusMinus ? '-' : '')
-                    + (rdo.comma ? numberWithCommas(final.down) : final.down);
+                    + (rdo.comma ? numberWithCommas(upper.down) : upper.down);
         } else {
             final.down = (rdo.plusMinus ? '-' : '')
                     + (rdo.comma ? numberWithCommas(Math.min(lower.down, upper.down)) : Math.min(lower.down, upper.down))
@@ -261,9 +268,14 @@ function format(score, likes, rdo, adjust) {
         }
     } else {
         var votes = calculateVotes(score, likes);
-        if (typeof adjust !== undefined && adjust > 0) {
+        if (adj1 && adj1 > 0) {
             votes.up += 1;
-        } else if (typeof adjust !== undefined && adjust < 0) {
+        } else if (adj1  && adj1 < 0) {
+            votes.down += 1;
+        }
+        if (adj2 && adj2 > 0) {
+            votes.up -= 1;
+        } else if (adj2  && adj2 < 0) {
             votes.down -= 1;
         }
         final.up += (rdo.plusMinus ? '+' : '')
@@ -273,13 +285,7 @@ function format(score, likes, rdo, adjust) {
     }
     return final;
 }
-function addOptions(){
-    var iconURL = getIconURL();
-    var optionURL = getOptionURL();
-    var head = document.getElementById("header-bottom-right");
-    head.appendChild(create('<span class = "serparator">|</span><span><a target="_blank" href="'
-            +optionURL+'"><img src="'+iconURL+'"></a></span>'));
-}
+
 
 function doUpvotes() {
     refreshStorage();
