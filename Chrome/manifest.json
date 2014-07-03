@@ -17,5 +17,9 @@
             "matches": ["http://*.reddit.com/*", "https://*.reddit.com/*"],
             "js": ["options.js","upvote.js","chrome-restore-options.js"]
         }
+    ],
+    "web_accessible_resources":[
+        "icon16.png",
+        "options.html"
     ]
 }
