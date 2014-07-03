@@ -17,19 +17,27 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>Chrome</key>
-	<dict/>
+	<dict>
+		<key>Database Quota</key>
+		<real>5242880</real>
+		<key>Global Page</key>
+		<string>global.html</string>
+	</dict>
 	<key>Content</key>
 	<dict>
 		<key>Scripts</key>
 		<dict>
 			<key>End</key>
 			<array>
+				<string>options.js</string>
 				<string>upvote.js</string>
+				<string>safari-restore-options.js</string>
 			</array>
 		</dict>
 		<key>Whitelist</key>
 		<array>
-			<string>http://www.reddit.com/r/*/comments/*</string>
+			<string>http://www.reddit.com/*</string>
+			<string>https://www.reddit.com/*</string>
 		</array>
 	</dict>
 	<key>ExtensionInfoDictionaryVersion</key>
@@ -41,7 +49,10 @@
 			<key>Allowed Domains</key>
 			<array>
 				<string>www.reddit.com</string>
+				<string>np.reddit.com</string>
 			</array>
+			<key>Include Secure Pages</key>
+			<true/>
 			<key>Level</key>
 			<string>Some</string>
 		</dict>
