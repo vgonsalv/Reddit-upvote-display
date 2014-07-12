@@ -1,12 +1,3 @@
-function create(htmlStr) {
-    var frag = document.createDocumentFragment(),
-        temp = document.createElement('div');
-    temp.innerHTML = htmlStr;
-    while (temp.firstChild) {
-        frag.appendChild(temp.firstChild);
-    }
-    return frag;
-}
 function RUDDisplayOption() {
     this.enabled = true;
     this.plusMinus = true;
@@ -15,27 +6,29 @@ function RUDDisplayOption() {
     this.overRES = true;
     return this;
 }
-
+function createSingleOption(id,caption){
+    var label = document.createElement("label");
+    var input = document.createElement("input");
+    input.type = "checkbox";
+    input .id = id;
+    label.appendChild(input);
+    label.appendChild(document.createTextNode(caption));
+    return label;
+}
 function RUDCreateDisplayOptionHTML(id, name){
-    var fragment ="<div><label>"+
-                    "<input type='checkbox' id='rud_"+id+"' />"+
-                    "Display upvotes/downvotes in "+name+
-                "</label>"+
-                "<br />"+
-                "<div>"+
-                    "<label><input type='checkbox' id='rud_"+id+"_plusMinus' />"+
-                        "Display +/-"+
-                    "</label>"+
-                    "<br />"+
-                    "<label><input type='checkbox' id='rud_"+id+"_comma' />"+
-                        "Display comma separator"+
-                    "</label>"+
-                    "<br />"+
-                    "<label><input type='checkbox' id='rud_"+id+"_range' />"+
-                        "Display as range"+
-                    "</label>"+
-                "</div></div>";
-    return create(fragment);
+    var pDiv = document.createElement("div");
+    pDiv.appendChild(createSingleOption("rud_"+id,"Display upvotes/downvotes in "+name));
+    pDiv.appendChild(document.createElement("br"));
+    
+    var cDiv = document.createElement("div");
+    cDiv.appendChild(createSingleOption("rud_"+id+"_plusMinus","Display +/-"));
+    cDiv.appendChild(document.createElement("br"));
+    cDiv.appendChild(createSingleOption("rud_"+id+"_comma","Display comma separator"));
+    cDiv.appendChild(document.createElement("br"));
+    cDiv.appendChild(createSingleOption("rud_"+id+"_range","Display as range"));
+    
+    pDiv.appendChild(cDiv);
+    return pDiv;
 }
 function RUDCreateOptionHTML(){
     var tag = document.getElementById("rud_comments").parentNode.parentNode;
