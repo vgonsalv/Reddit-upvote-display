@@ -24,7 +24,7 @@ pageMod.PageMod({
     }
 });
 pageMod.PageMod({
-    include: "resource://com-dot-reddit-upvote-display-at-jetpack/upvote/data/options.html",
+    include: "resource://vgonsalv-at-cs-dot-purdue-dot-edu/upvote/data/options.html",
     contentScriptFile: [
         self.data.url("options.js"),
         self.data.url("saveRelay.js")
