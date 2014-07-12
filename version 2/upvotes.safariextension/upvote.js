@@ -1,22 +1,25 @@
+//object that represents the arrows and the text between them
 function MidcolTag(midcolTag) {
     this.tag = midcolTag;
     this.likeTag = midcolTag.children[3];
     this.unTag = midcolTag.children[2];
     this.disTag = midcolTag.children[1];
 }
+//setters for relevant properties
 MidcolTag.prototype.setLikeContent = function(content) {
-    this.likeTag.innerHTML = content;
+    this.likeTag.textContent = content;
 };
 MidcolTag.prototype.setUnContent = function(content) {
-    this.unTag.innerHTML = content;
+    this.unTag.textContent = content;
 };
 MidcolTag.prototype.setDisContent = function(content) {
-    this.disTag.innerHTML = content;
+    this.disTag.textContent = content;
 };
 MidcolTag.prototype.setWidth = function(width) {
     this.tag.style.width = width;
 };
 
+//represent the linkinfo box and import elements inside it
 function DateTag(dateTag) {
     this.tag = dateTag;
     this.text = dateTag.getElementsByTagName("span")[0];
@@ -62,10 +65,11 @@ function LinkTag(linkTag) {
     this.midcolTag = new MidcolTag(this.tag.getElementsByClassName("midcol")[0]);
 }
 
-
+//get's the linkinfo box on the page
 function findInfoTag(element) {
     return new InfoTag(element.getElementsByClassName("linkinfo")[0]);
 }
+//gets array of arrows from comments section
 function findMidcolTag(element) {
     var elems = element.getElementById("siteTable").getElementsByTagName("div");
     for (i in elems) {
@@ -74,6 +78,7 @@ function findMidcolTag(element) {
         }
     }
 }
+//gets all the links on the frontpage
 function findLinkTags() {
     var table = document.getElementById("siteTable");
     var linkTags = table.getElementsByClassName("thing link");
@@ -83,6 +88,7 @@ function findLinkTags() {
     }
     return links;
 }
+//clears expired entries to avoid running out of space
 function refreshStorage() {
     for (var i = 0; i < localStorage.length; i++) {
         var key = localStorage.key(i);
@@ -94,12 +100,14 @@ function refreshStorage() {
         }
     }
 }
+//checks to to see if entry is older than 5 minutes
 function isExpired(data) {
-    return (new Date().getTime() - data.time) > 5 * 60 * 1000;
+    return false;//(new Date().getTime() - data.time) > 5 * 60 * 1000;
 }
+//gets link from cache if it is in it
 function getCachedLink(shortLink) {
     var data = localStorage['rud_'+shortLink];
-    if (data === undefined)
+    if (!data)
         return undefined;
     else
         data = JSON.parse(data);
@@ -109,14 +117,14 @@ function getCachedLink(shortLink) {
     }
     return data;
 }
-
+//adds  valid links to cache
 function addCachedLink(shortlink, score, likes) {
     if(!score || !likes)
         return;
     var data = {time: new Date().getTime(), score: score, likes: likes};
     localStorage['rud_'+shortlink] = JSON.stringify(data);
 }
-
+//sends votes to server and adds to cache
 function sendVotes(shortlink, infoTag) {
     var xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
@@ -129,6 +137,7 @@ function sendVotes(shortlink, infoTag) {
     xmlHttp.send(JSON.stringify(obj));
     addCachedLink(shortlink, infoTag.scoreTag.getScore(), infoTag.scoreTag.getLikes());
 }
+//gets votes from server/cache
 function getVotes(request, cbk) {
     var have = [];
     var toGet = [];
@@ -167,31 +176,52 @@ function getVotes(request, cbk) {
         cbk(have);
     }
 }
-
-function create(htmlStr) {//thanks James from SO
-    var frag = document.createDocumentFragment(),
-            temp = document.createElement('div');
-    temp.innerHTML = htmlStr;
-    while (temp.firstChild) {
-        frag.appendChild(temp.firstChild);
-    }
-    return frag;
-}
+//adds commas to a number
 function numberWithCommas(x) {//thanks Elias Zamaria from SO
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/, ",");
 }
+//formats the vote data into the linkinfo box
 function formatVotesLinkinfo(linkinfoTag, votes) {
-    var toAdd = "<span class =\"upvotes\" style=\"font-size:80%;color:orangered;\">" +
-            "<span class=\"number\">" + votes.up + "</span>&#32;" +
-            "<span class=\"word\">up votes</span>&#32;" +
-            "</span>" +
-            "<span class =\"downvotes\" style=\"font-size:80%;color:#5f99cf;\">" +
-            "<span class=\"number\">" + votes.down + "</span>&#32;" +
-            "<span class=\"word\">down votes</span>" +
-            "</span>";
-    toAdd = create(toAdd);
-    linkinfoTag.tag.insertBefore(toAdd, linkinfoTag.shortlinkTag.tag);
+    var uSpan = document.createElement("span");
+    uSpan.className = "upvotes";
+    uSpan.style.fontSize = "80%";
+    uSpan.style.color= "orangered";
+    
+    var nSpan = document.createElement("span");
+    nSpan.className = "number";
+    nSpan.appendChild(document.createTextNode(votes.up));
+    
+    var wSpan = document.createElement("span");
+    wSpan.className = "word";
+    wSpan.appendChild(document.createTextNode("up votes"));
+    
+    uSpan.appendChild(nSpan);
+    uSpan.appendChild(document.createTextNode(" "));
+    uSpan.appendChild(wSpan);
+    uSpan.appendChild(document.createTextNode(" "));
+    
+    var dSpan = document.createElement("span");
+    dSpan.className = "downvotes";
+    dSpan.style.fontSize = "80%";
+    dSpan.style.color= "#5f99cf";
+    
+    nSpan = document.createElement("span");
+    nSpan.className = "number";
+    nSpan.appendChild(document.createTextNode(votes.down));
+    
+    wSpan = document.createElement("span");
+    wSpan.className = "word";
+    wSpan.appendChild(document.createTextNode("down votes"));
+    
+    dSpan.appendChild(nSpan);
+    dSpan.appendChild(document.createTextNode(" "));
+    dSpan.appendChild(wSpan);
+    
+    
+    linkinfoTag.tag.insertBefore(uSpan, linkinfoTag.shortlinkTag.tag);
+    linkinfoTag.tag.insertBefore(dSpan, linkinfoTag.shortlinkTag.tag);
 }
+//formats vote data between arrows
 function formatVotesArrows(midcolTag, score, likes, rdo) {
     var adj = adjustVotes(midcolTag);
     var votes = format(score, likes, rdo, +1,adj);
@@ -209,12 +239,14 @@ function formatVotesArrows(midcolTag, score, likes, rdo) {
 
     midcolTag.setWidth(Math.max(1.2 * len,5.1) + 'ex');
 }
+//calculates up/ddown votes from score/likes
 function calculateVotes(score, percent) {
     var votes = new Votes();
     votes.up = Math.round(percent * score / (2 * percent - 1));
     votes.down = Math.round(score * (1 - percent) / (2 * percent - 1));
     return votes;
 }
+//determines users votes on the post
 function adjustVotes(midcolTag) {
     switch (midcolTag.tag.className) {
         case "midcol likes":
@@ -225,9 +257,11 @@ function adjustVotes(midcolTag) {
             return -1;
     }
 }
+//regex to dermine if in comments based on the url 
 function inComments() {
     return (/.*reddit.com\/r\/[^\/]+\/comments\/.*/).test(document.URL);
 }
+//formats the votes
 function format(score, likes, rdo, adj1,adj2) {
     var final = new Votes("", "");
     if (rdo.range) {
@@ -286,10 +320,10 @@ function format(score, likes, rdo, adj1,adj2) {
     return final;
 }
 
-
+//method called to show everything on page
 function doUpvotes() {
     refreshStorage();
-    addOptions();
+    addOptions();//defined in <browser>-restore-options.js
     if (inComments()) {
         if (RUDOption.comments.enabled) {
             var midcolTag = findMidcolTag(document);
@@ -325,11 +359,24 @@ function doUpvotes() {
                             voteInfo[i].likes !== 50) {
                         if (RUDOption.frontpage.res.enabled) {
                             var votes = format(voteInfo[i].score, voteInfo[i].likes, RUDOption.frontpage.res);
-                            var span = '<span>(' +
-                                    '<span style="color:#FF8B24">' + votes.up + '</span>|' +
-                                    '<span style="color:#9494FF">' + votes.down + '</span>' +
-                                    ')</span>';
-                            links[i].taglineTag.innerHTML = span + links[i].taglineTag.innerHTML;
+                            var pSpan = document.createElement("span");
+                            var tagLine = links[i].taglineTag;
+                            tagLine.insertBefore(pSpan,tagLine.firstChild);
+                            
+                            var uSpan = document.createElement("span");
+                            var dSpan = document.createElement("span");
+                            
+                            uSpan.style.color="#FF8B24";
+                            dSpan.style.color="#9494FF";                            
+                            
+                            uSpan.textContent = votes.up;
+                            dSpan.textContent = votes.down;
+                            
+                            pSpan.appendChild(document.createTextNode("("));
+                            pSpan.appendChild(uSpan);
+                            pSpan.appendChild(document.createTextNode("|"));
+                            pSpan.appendChild(dSpan);
+                            pSpan.appendChild(document.createTextNode(")"));
                         }
                         if (RUDOption.frontpage.arrows.enabled) {
                             formatVotesArrows(links[i].midcolTag, voteInfo[i].score,
