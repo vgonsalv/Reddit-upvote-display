@@ -1,0 +1,18 @@
+{
+    "name": "upvote",
+    "title": "Reddit-upvote-display",
+    "id": "vgonsalv@cs.purdue.edu",
+    "description": "an addon that dsplays the up-vote and down-vote counts",
+    "author": "vandale 111",
+    "license": "MPL 2.0",
+    "version": "2.0.0",
+    "preferences": [
+        {
+            "name": "RUDOption",
+            "title": "RUDOption",
+            "type": "string",
+            "hidden": true,
+            "value":""
+        }
+    ]
+}
