@@ -1,0 +1,40 @@
+{
+    "manifest_version": 2,
+    "name": "Reddit-upvote-display",
+    "description": "This extension shows upvote and downvote counts for a reddit page.",
+    "version": "2.0.1",
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    },
+    "options_page": "options.html",
+    "permissions": [
+        "storage"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "http://*.reddit.com/*",
+                "https://*.reddit.com/*"
+            ],
+            "js": [
+                "jquery/jquery.js",
+                "options.js",
+                "upvote.js",
+                "chrome-restore-options.js"
+            ]
+        }
+    ],
+    "web_accessible_resources": [
+        "icon16.png",
+        "options.html"
+    ],
+    "background": {
+        "scripts": [
+            "jquery/jquery.js",
+            "background.js"
+        ],
+        "persistent": false
+    }
+}
