@@ -2,16 +2,23 @@ self.port.on("options", function(ro) {
     RUDOption = JSON.parse(ro);
     doUpvotes();
 });
-window.addEventListener('message', function(event) {
-    if(event.data &&event.data==="showOptions"){
-        self.port.emit("showOptions","");
-    }
-}, false);
 function addOptions(){
-    var iconURL = self.options.iconURL;
     var head = document.getElementById("header-bottom-right");
-    head.appendChild(create('<span class = "serparator">|</span>'+
-                        '<img onclick ="window.postMessage(\'showOptions\','+
-                        '\'*\')" src="'+iconURL+'"></a></span>'));
+    var s = document.createElement("span");
+    s.className = "serparator";
+    s.appendChild(document.createTextNode("|"));
+    
+    head.appendChild(s);
+    
+    s = document.createElement("span");
+    
+    var i = document.createElement("img");
+    i.src =  self.options.iconURL;
+    i.onclick= function(){
+        self.port.emit("showOptions","");
+    };
+    
+    s.appendChild(i);
+    head.appendChild(s);
 }
 
