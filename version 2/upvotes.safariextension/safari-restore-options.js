@@ -7,9 +7,22 @@ safari.self.addEventListener("message", function(messageEvent) {
 , false);
 safari.self.tab.dispatchMessage("getOption", null);
 function addOptions(){
-    var iconURL = safari.extension.baseURI+"icon16.png";
-    var optionURL = safari.extension.baseURI+"options.html";
     var head = document.getElementById("header-bottom-right");
-    head.appendChild(create('<span class = "serparator">|</span><span><a target="_blank" href="'
-            +optionURL+'"><img src="'+iconURL+'"></a></span>'));
+    var s = document.createElement("span");
+    s.className = "serparator";
+    s.appendChild(document.createTextNode("|"));
+    
+    head.appendChild(s);
+    
+    s = document.createElement("span");
+    var a = document.createElement("a");
+    a.href = safari.extension.baseURI+"options.html";
+    a.setAttribute("target","_blank");
+    
+    var i = document.createElement("img");
+    i.src = safari.extension.baseURI+"icon16.png";
+    
+    a.appendChild(i);
+    s.appendChild(a);
+    head.appendChild(s);
 }
