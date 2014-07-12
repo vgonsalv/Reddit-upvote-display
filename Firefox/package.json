@@ -1,9 +1,0 @@
-{
-  "name": "upvote",
-  "title": "Reddit-upvote-display",
-  "id": "vgonsalv@cs.purdue.edu",
-  "description": "an addon that dsplays the up-vote and down-vote counts",
-  "author": "vandale 111",
-  "license": "MPL 2.0",
-  "version": "1.0"
-}
